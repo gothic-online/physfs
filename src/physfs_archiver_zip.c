@@ -290,6 +290,15 @@ static int readui32(PHYSFS_Io *io, PHYSFS_uint32 *val)
     return 1;
 } /* readui32 */
 
+/*
+ * Convert the string to upper case format (G2O path capitalization feature)
+ */
+static void str_toupper(char* str)
+{
+    for (PHYSFS_uint32 i = 0, end = strlen(str); i < end; ++i)
+        str[i] = (char)toupper(str[i]);
+}
+
 
 /*
  * Read an unsigned 16-bit int and swap to native byte order.
@@ -801,6 +810,7 @@ static int zip_resolve_symlink(PHYSFS_Io *io, ZIPinfo *info, ZIPentry *entry)
     {
         path[entry->uncompressed_size] = '\0';    /* null-terminate it. */
         zip_convert_dos_path(entry->version, path);
+        str_toupper(path);
         entry->symlink = zip_follow_symlink(io, info, path);
     } /* else */
 
@@ -1049,6 +1059,7 @@ static ZIPentry *zip_load_entry(ZIPinfo *info, const int zip64,
     name[fnamelen] = '\0';  /* null-terminate the filename. */
 
     zip_convert_dos_path(entry.version, name);
+    str_toupper(name);
 
     retval = (ZIPentry *) __PHYSFS_DirTreeAdd(&info->tree, name, isdir);
     __PHYSFS_smallFree(name);
